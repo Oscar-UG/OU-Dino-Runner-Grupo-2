@@ -2,7 +2,6 @@ import pygame
 from pygame.sprite import Sprite
 from dino_runner.utils.constants import RUNNING, JUMPING, DUCKING
 
-
 RUNNING_ACTION = 'running'
 JUMPING_ACTION = 'jumping'
 DUCKING_ACTION = 'ducking'
@@ -21,6 +20,7 @@ class Dinosaur(Sprite):
         self.jump_velocity = self.JUMP_VELOCITY
         self.step = 0
         self.action = RUNNING_ACTION
+        self.sound_jump = pygame.mixer.Sound('dino_runner/assets/Sounds/sound_jump.mp3')
 
     def reset_rect(self, y_pos=None):
         self.rect = self.image.get_rect()
@@ -38,6 +38,7 @@ class Dinosaur(Sprite):
         if self.action != JUMPING_ACTION:
             if user_input[pygame.K_UP]:
                 self.action = JUMPING_ACTION
+                self.sound_jump.play()
             elif user_input[pygame.K_DOWN]:
                 self.action = DUCKING_ACTION
             else:
