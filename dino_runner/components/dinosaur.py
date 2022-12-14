@@ -63,7 +63,7 @@ class Dinosaur(Sprite):
             self.action = RUNNING_ACTION
         
     def duck(self):
-        self.image = DUCKING[0] if self.step < 5 else DUCKING[1]
+        self.image = DUCKING[self.step // 5]
         self.reset_rect(y_pos=self.Y_DUCK_POS)
         self.step += 1
 
