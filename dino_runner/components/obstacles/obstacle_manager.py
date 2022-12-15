@@ -1,6 +1,6 @@
 from dino_runner.components.obstacles.cactus import Cactus
 from dino_runner.components.obstacles.bird import Bird
-from dino_runner.utils.constants import SMALL_CACTUS, LARGE_CACTUS
+from dino_runner.utils.constants import SMALL_CACTUS, LARGE_CACTUS, DINO_DEAD
 from random import randint
 import pygame
 
@@ -27,7 +27,8 @@ class ObstacleManager:
         for obstacle in self.obstacles:
             obstacle.update(game.game_speed, self.obstacles)
             if obstacle.rect.colliderect(game.player.rect):
-                pygame.time.delay(500)
+                game.player.image = DINO_DEAD
+                pygame.time.delay(200)
                 game.playing = False
                 game.death_counts += 1
 

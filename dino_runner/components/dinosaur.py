@@ -20,7 +20,7 @@ class Dinosaur(Sprite):
         self.jump_velocity = self.JUMP_VELOCITY
         self.step = 0
         self.action = RUNNING_ACTION
-        self.sound_jump = pygame.mixer.Sound('dino_runner/assets/Sounds/sound_jump.mp3')
+        self.sound_jump = pygame.mixer.Sound('dino_runner/assets/Sounds/sound_jump.wav')
 
     def reset_rect(self, y_pos=None):
         self.rect = self.image.get_rect()
