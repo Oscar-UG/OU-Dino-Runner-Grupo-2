@@ -3,9 +3,8 @@ from dino_runner.utils.constants import BIRD
 from random import randint
 
 class Bird(Obstacle):
-    def __init__(self, images):
-        self.bird = 0
-        super().__init__(images[self.bird])
+    def __init__(self):
+        super().__init__(BIRD[0])
         self.rect.y = randint(200, 330)
         self.step = 0
 
