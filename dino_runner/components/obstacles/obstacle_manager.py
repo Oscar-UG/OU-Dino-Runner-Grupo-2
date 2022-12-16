@@ -10,6 +10,7 @@ class ObstacleManager:
 
     def __init__(self):
         self.obstacles = []
+        self.sound_lose = pygame.mixer.Sound('dino_runner/assets/Sounds/sound_lose.wav')
 
     def generate_random_obstacles(self):
         obs_random = randint(0, 2)
@@ -20,17 +21,18 @@ class ObstacleManager:
         elif obs_random == 2:
             self.obstacles.append(Bird())
         
-    def update(self, game):
+    def update(self, game_speed, player, on_death):
         if len(self.obstacles) == 0:
             self.generate_random_obstacles()
 
         for obstacle in self.obstacles:
-            obstacle.update(game.game_speed, self.obstacles)
-            if obstacle.rect.colliderect(game.player.rect):
-                game.player.image = DINO_DEAD
-                pygame.time.delay(200)
-                game.playing = False
-                game.death_counts += 1
+            obstacle.update(game_speed, self.obstacles)
+            if obstacle.rect.colliderect(player.rect) and on_death():
+                self.sound_lose.play()
+                pygame.time.delay(500)
+                # player.image = DINO_DEAD
+                # game.playing = False
+                # game.death_counts += 1
 
     def draw(self, screen):
         for obstacle in self.obstacles:

@@ -1,8 +1,20 @@
 import pygame
-from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, FONT_BOLD, DINO_START, RESET, GAME_OVER
+from dino_runner.utils.constants import (BG, 
+                                        ICON, 
+                                        SCREEN_HEIGHT, 
+                                        SCREEN_WIDTH, 
+                                        TITLE, 
+                                        FPS, 
+                                        FONT_BOLD, 
+                                        DINO_START, 
+                                        RESET, 
+                                        GAME_OVER, 
+                                        SHIELD_TYPE, 
+                                        DINO_DEAD)
 from dino_runner.components.dinosaur import Dinosaur
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
 from dino_runner.components.score import Score
+from dino_runner.components.power_ups.power_up_manager import PowerUpManager
 
 
 class Game:
@@ -19,6 +31,7 @@ class Game:
         self.player = Dinosaur()
         self.obstacle_manager = ObstacleManager()
         self.score = Score()
+        self.power_up_manager = PowerUpManager()
         self.executing = False
         self.death_counts = 0
         self.half_screen_width = SCREEN_WIDTH // 2
@@ -35,6 +48,7 @@ class Game:
         # Game loop: events - update - draw
         self.playing = True
         self.obstacle_manager.reset_obstacles()
+        self.power_up_manager.reset_power_ups()
         self.score.points = 0
         while self.playing:
             self.events()
@@ -50,15 +64,18 @@ class Game:
     def update(self):
         user_input = pygame.key.get_pressed()
         self.player.update(user_input)
-        self.obstacle_manager.update(self)
+        self.obstacle_manager.update(self.game_speed, self.player, self.on_death)
+        self.power_up_manager.update(self.game_speed, self.score.points, self.player)
         self.score.update(self)
 
     def draw(self):
         self.clock.tick(FPS)
-        self.screen.fill((224, 224, 224))
+        self.screen.fill((255, 255, 255))
         self.draw_background()
         self.player.draw(self.screen)
+        self.player.draw_active_power_up(self.screen)
         self.obstacle_manager.draw(self.screen)
+        self.power_up_manager.draw(self.screen)
         self.score.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
@@ -102,3 +119,12 @@ class Game:
 
     def draw_image(self, image, x_pos, y_pos):
         self.screen.blit(image, (self.half_screen_width - x_pos, self.half_screen_height - y_pos))
+
+    def on_death(self):
+        has_shield = self.player.type == SHIELD_TYPE
+        if not has_shield:
+            self. player.image = DINO_DEAD
+            self.draw()
+            self.death_counts += 1
+            self.playing = False
+        return not has_shield

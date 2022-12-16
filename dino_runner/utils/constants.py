@@ -77,6 +77,10 @@ DINO_DEAD = pygame.image.load(os.path.join(IMG_DIR, 'Dino/DinoDead.png'))
 
 GAME_OVER = pygame.image.load(os.path.join(IMG_DIR, 'Other/GameOver.png'))
 
+SHIELD_TYPE = 'shield'
+
+HAMMER_TYPE = 'hammer'
+
 DEFAULT_TYPE = "default"
 
 FONT_BOLD = 'freesansbold.ttf'
