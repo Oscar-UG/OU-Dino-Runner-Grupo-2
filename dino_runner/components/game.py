@@ -1,20 +1,21 @@
 import pygame
+from dino_runner.components.dinosaur import Dinosaur
+from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
+from dino_runner.components.score import Score
+from dino_runner.components.menu import Menu
+from dino_runner.components.power_ups.power_up_manager import PowerUpManager
 from dino_runner.utils.constants import (BG, 
                                         ICON, 
                                         SCREEN_HEIGHT, 
                                         SCREEN_WIDTH, 
                                         TITLE, 
                                         FPS, 
-                                        FONT_BOLD, 
                                         DINO_START, 
                                         RESET, 
                                         GAME_OVER, 
-                                        SHIELD_TYPE, 
+                                        SHIELD_TYPE,
+                                        HAMMER_TYPE,
                                         DINO_DEAD)
-from dino_runner.components.dinosaur import Dinosaur
-from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
-from dino_runner.components.score import Score
-from dino_runner.components.power_ups.power_up_manager import PowerUpManager
 
 
 class Game:
@@ -32,10 +33,10 @@ class Game:
         self.obstacle_manager = ObstacleManager()
         self.score = Score()
         self.power_up_manager = PowerUpManager()
+        self.menu = Menu()
         self.executing = False
         self.death_counts = 0
-        self.half_screen_width = SCREEN_WIDTH // 2
-        self.half_screen_height = SCREEN_HEIGHT // 2
+        self.sound_break = pygame.mixer.Sound('dino_runner/assets/Sounds/sound_break.wav')
 
     def execute(self):
         self.executing = True
@@ -92,14 +93,14 @@ class Game:
     def show_menu(self):
         self.screen.fill((192, 192, 192))
         if self.death_counts == 0:
-            self.draw_image(DINO_START, 40, 150)
-            self.menu_view('Press any key to start', 0, -10)
+            self.menu.draw_image(self.screen, DINO_START, 40, 150)
+            self.menu.menu_view(self.screen, 'Press any key to start', -10)
         else:
-            self.draw_image(GAME_OVER, 190, 160)
-            self.draw_image(RESET, 40, 90)
-            self.menu_view('Press any key to restart', 0, -40)
-            self.menu_view(f'Your score: {self.score.points}', 0, -90)
-            self.menu_view(f'Your deaths: {self.death_counts}', 0, -140)
+            self.menu.draw_image(self.screen, GAME_OVER, 190, 160)
+            self.menu.draw_image(self.screen, RESET, 40, 90)
+            self.menu.menu_view(self.screen, 'Press any key to restart', -40)
+            self.menu.menu_view(self.screen, f'Your score: {self.score.points}', -90)
+            self.menu.menu_view(self.screen, f'Your deaths: {self.death_counts}', -140)
         pygame.display.update()
         self.handle_menu_event()
 
@@ -110,21 +111,15 @@ class Game:
             elif event.type == pygame.KEYDOWN:
                 self.run()
 
-    def menu_view(self, text, x_pos, y_pos):
-        font = pygame.font.Font(FONT_BOLD, 30)
-        message = font.render(text, True, (0, 0, 0))
-        message_rect = message.get_rect()
-        message_rect.center = (self.half_screen_width - x_pos, self.half_screen_height - y_pos)
-        self.screen.blit(message, message_rect)
-
-    def draw_image(self, image, x_pos, y_pos):
-        self.screen.blit(image, (self.half_screen_width - x_pos, self.half_screen_height - y_pos))
-
-    def on_death(self):
-        has_shield = self.player.type == SHIELD_TYPE
-        if not has_shield:
+    def on_death(self, obstacle):
+        has_shield = self.player.type == SHIELD_TYPE 
+        has_hammer = self.player.type == HAMMER_TYPE
+        if not has_shield and not has_hammer:
             self. player.image = DINO_DEAD
             self.draw()
             self.death_counts += 1
             self.playing = False
-        return not has_shield
+        elif has_hammer:
+            self.obstacle_manager.obstacles.remove(obstacle)
+            self.sound_break.play()
+        return not has_shield and not has_hammer

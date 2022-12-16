@@ -1,5 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
+from dino_runner.components.menu import Menu
 from dino_runner.utils.constants import (RUNNING,
                                          JUMPING,
                                          DUCKING,
@@ -8,6 +9,10 @@ from dino_runner.utils.constants import (RUNNING,
                                          RUNNING_SHIELD,
                                          JUMPING_SHIELD,
                                          SHIELD_TYPE,
+                                         DUCKING_HAMMER,
+                                         RUNNING_HAMMER,
+                                         JUMPING_HAMMER,
+                                         HAMMER_TYPE,
                                          FONT_BOLD,
                                          SCREEN_WIDTH,
                                          SCREEN_HEIGHT)
@@ -15,9 +20,9 @@ from dino_runner.utils.constants import (RUNNING,
 RUNNING_ACTION = 'running'
 JUMPING_ACTION = 'jumping'
 DUCKING_ACTION = 'ducking'
-DUCK_IMG = {DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD}
-RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD}
-JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD}
+DUCK_IMG = {DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD, HAMMER_TYPE: DUCKING_HAMMER}
+RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD, HAMMER_TYPE: RUNNING_HAMMER}
+JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD, HAMMER_TYPE: JUMPING_HAMMER}
 
 
 class Dinosaur(Sprite):
@@ -35,12 +40,12 @@ class Dinosaur(Sprite):
         self.jump_velocity = self.JUMP_VELOCITY
         self.step = 0
         self.action = RUNNING_ACTION
-        self.sound_jump = pygame.mixer.Sound(
-            'dino_runner/assets/Sounds/sound_jump.wav')
+        self.sound_jump = pygame.mixer.Sound('dino_runner/assets/Sounds/sound_jump.wav')
         self.has_power_up = False
         self.power_up_time_up = 0
         self.half_screen_width = SCREEN_WIDTH // 2
         self.half_screen_height = SCREEN_HEIGHT // 2
+        self.menu = Menu()
 
     def reset_rect(self, y_pos=None):
         self.rect = self.image.get_rect()
@@ -102,11 +107,7 @@ class Dinosaur(Sprite):
             left_time = round(
                 (self.power_up_time_up - pygame.time.get_ticks()) / 1000, 2)
             if left_time >= 0:
-                font = pygame.font.Font(FONT_BOLD, 30)
-                message = font.render(f'{self.type.capitalize()} enabled for {left_time} seconds', True, (0, 0, 0))
-                message_rect = message.get_rect()
-                message_rect.center = (self.half_screen_width, self.half_screen_height - 250)
-                screen.blit(message, message_rect)
+                self.menu.menu_view(screen, f'{self.type.capitalize()} enabled for {left_time} seconds', 250)
             else:
                 self.type = DEFAULT_TYPE
                 self.has_power_up = False

@@ -1,5 +1,6 @@
 from dino_runner.components.power_ups.power_up import PowerUp
 from dino_runner.components.power_ups.shield import Shield
+from dino_runner.components.power_ups.hammer import Hammer
 from random import randint
 import pygame
 
@@ -10,8 +11,13 @@ class PowerUpManager:
         self.sound_bonus = pygame.mixer.Sound('dino_runner/assets/Sounds/sound_bonus.wav')
 
     def generate_power_up(self, score):
-        if not self.power_ups and self.when_appers == score:
+        num_random = randint(0, 1)
+        condition = not self.power_ups and self.when_appers == score
+        if condition and num_random == 0:
             self.power_ups.append(Shield())
+            self.when_appers += randint(200, 300)
+        elif condition and num_random == 1:
+            self.power_ups.append(Hammer())
             self.when_appers += randint(200, 300)
 
     def update(self, game_speed, score, player):
